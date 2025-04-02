@@ -1,0 +1,369 @@
+definitions:
+  models.Feedback:
+    properties:
+      comment:
+        example: Кот просто восторг!
+        type: string
+      product_id:
+        type: integer
+      rating:
+        example: 5
+        type: number
+    type: object
+  models.Product:
+    properties:
+      category:
+        example: electronics
+        type: string
+      description:
+        example: 15.6 дюймов
+        type: string
+      id:
+        type: integer
+      image:
+        example: /assets/cat-surprised.gif
+        type: string
+      price:
+        example: 1500000
+        type: number
+      rating:
+        example: 5
+        type: number
+      title:
+        example: MacBook Pro
+        type: string
+    type: object
+  models.User:
+    properties:
+      email:
+        example: example@example.com
+        type: string
+      password:
+        example: "12345678"
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is the coolest kotoshop
+  title: Kotoshop
+  version: "2.0"
+paths:
+  /api/feedback/get_all:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список всех отзывов на товар
+      parameters:
+      - description: ID товара
+        in: query
+        name: product_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Возвращает отзывы
+      tags:
+      - Feedback
+  /api/feedback/get_rating:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает средний рейтинг всех отзывов на товар
+      parameters:
+      - description: ID товара
+        in: query
+        name: product_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Возвращает рейтинг
+      tags:
+      - Feedback
+  /api/feedback/post:
+    post:
+      consumes:
+      - application/json
+      description: Отправляет отзыв пользователя на товар
+      parameters:
+      - description: Отзыв
+        in: body
+        name: feedback
+        required: true
+        schema:
+          $ref: '#/definitions/models.Feedback'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Отправляет отзыв
+      tags:
+      - Feedback
+  /api/login:
+    post:
+      consumes:
+      - application/json
+      description: Аутентифицирует пользователя через почту и пароль
+      parameters:
+      - description: Данные пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Аутентифицирует пользователя
+      tags:
+      - Auth
+  /api/products/get_all:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список всех товаров магазина
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Возвращает товары
+      tags:
+      - Products
+  /api/products/post:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет новый товар
+      parameters:
+      - description: Данные о товаре
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/models.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Добавляет товар
+      tags:
+      - Products
+  /api/profile:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает данные о пользователе при корректном токене
+      parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Возвращает данные о пользователе
+      tags:
+      - Auth
+  /api/signup:
+    post:
+      consumes:
+      - application/json
+      description: Регистрирует пользователя через почту и пароль
+      parameters:
+      - description: Данные пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Регистрирует нового пользователя
+      tags:
+      - Auth
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

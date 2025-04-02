@@ -1,47 +1,48 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchProducts } from "../api/products";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { fetchProducts } from '../api/products'
+
 export const loadProducts = createAsyncThunk(
-  "products/loadProducts",
+  'products/loadProducts',
   async () => {
-    const products = await fetchProducts();
-    return products;
+    const products = await fetchProducts()
+    return products
   }
-);
+)
 const productsSlice = createSlice({
-  name: "products",
+  name: 'products',
   initialState: {
     items: [],
-    status: "idle",
+    status: 'idle',
     error: null,
-    category: "Все",
-    sortBy: "default",
-    searchQuery: "", // Добавляем состояние для поискового запроса
+    category: 'Все',
+    sortBy: 'default',
+    searchQuery: '', // Добавляем состояние для поискового запроса
   },
   reducers: {
     setCategory: (state, action) => {
-      state.category = action.payload;
+      state.category = action.payload
     },
     setSortBy: (state, action) => {
-      state.sortBy = action.payload;
+      state.sortBy = action.payload
     },
     setSearchQuery: (state, action) => {
-      state.searchQuery = action.payload;
+      state.searchQuery = action.payload
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(loadProducts.pending, (state) => {
-        state.status = "loading";
+        state.status = 'loading'
       })
       .addCase(loadProducts.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.items = action.payload;
+        state.status = 'succeeded'
+        state.items = action.payload
       })
       .addCase(loadProducts.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      });
+        state.status = 'failed'
+        state.error = action.error.message
+      })
   },
-});
-export const { setCategory, setSortBy, setSearchQuery } = productsSlice.actions;
-export default productsSlice.reducer;
+})
+export const { setCategory, setSortBy, setSearchQuery } = productsSlice.actions
+export default productsSlice.reducer

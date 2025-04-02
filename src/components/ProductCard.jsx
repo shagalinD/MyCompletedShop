@@ -10,6 +10,7 @@ import {
 import { motion } from 'framer-motion'
 import { useDispatch } from 'react-redux'
 import { addToCart } from '../features/cartSlice'
+import { Link } from 'react-router-dom'
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch()
   return (
@@ -39,7 +40,11 @@ const ProductCard = ({ product }) => {
             paddingBottom: 0, // Убирает отступы по нижнему краю
           }}
         />
-        <CardContent sx={{ paddingTop: 0, marginTop: 'auto' }}>
+        <CardContent
+          component={Link}
+          to={`/product/${product.id}`}
+          sx={{ paddingTop: 0, marginTop: 'auto' }}
+        >
           <Typography variant='h6'>{product.title}</Typography>
           <Typography variant='body2'>{product.description}</Typography>
           <Typography variant='h5'>{product.price}$</Typography>
