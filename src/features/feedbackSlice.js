@@ -46,8 +46,28 @@ const feedbackSlice = createSlice({
         state.status = 'failed'
         state.error = action.error.message
       })
+      .addCase(addFeedback.pending, (state, action) => {
+        // Можно добавить временный отзыв с флагом isPending
+        state.status = 'loading'
+      })
       .addCase(addFeedback.fulfilled, (state, action) => {
-        state.items.push(action.payload)
+        state.status = 'succeeded'
+        // Заменяем или добавляем полный объект от сервера
+        const index = state.items.findIndex(
+          (item) => item.tempId === action.meta.arg.tempId
+        )
+        if (index >= 0) {
+          state.items[index] = action.payload
+        } else {
+          state.items.push(action.payload)
+        }
+      })
+      .addCase(addFeedback.rejected, (state, action) => {
+        state.status = 'failed'
+        // Удаляем временный отзыв, если был добавлен
+        state.items = state.items.filter(
+          (item) => item.tempId !== action.meta.arg.tempId
+        )
       })
   },
 })

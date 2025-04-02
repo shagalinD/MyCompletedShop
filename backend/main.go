@@ -43,9 +43,8 @@ func main() {
 	r.POST("/api/products/post", handlers.CreateProduct)
 	r.GET("/api/products/get_all", handlers.GetAllProducts)
 	r.GET("/api/profile", handlers.Profile)
-	r.GET("/api/feedback/get_rating", handlers.GetRating)
 	r.GET("/api/feedback/get_all", handlers.GetFeedbacks)
-	r.POST("/api/feedback/post", handlers.PostFeedback)
+	r.POST("/api/feedback/post", handlers.AuthMiddleware, handlers.PostFeedback)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Run()

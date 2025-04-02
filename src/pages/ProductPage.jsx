@@ -20,6 +20,7 @@ import { loadProducts } from '../features/productsSlice'
 
 const ProductPage = () => {
   const { id } = useParams()
+
   const dispatch = useDispatch()
   const [comment, setComment] = React.useState('')
   const [rating, setRating] = React.useState(5)
@@ -38,15 +39,31 @@ const ProductPage = () => {
     if (productsStatus === 'idle') {
       dispatch(loadProducts())
     }
+    console.log(id)
     dispatch(fetchFeedbacks(id))
   }, [dispatch, id, productsStatus])
 
   const handleSubmit = (e) => {
     e.preventDefault()
     if (comment.trim() && rating > 0) {
-      dispatch(addFeedback({ productId: id, comment, rating }))
-      setComment('')
-      setRating(5)
+      const tempId = Date.now() // Временный ID для оптимистичного обновления
+      dispatch(
+        addFeedback({
+          productId: parseInt(id),
+          comment,
+          rating,
+          tempId, // Добавляем временный идентификатор
+        })
+      )
+        .unwrap() // Обрабатываем Promise
+        .then(() => {
+          setComment('')
+          setRating(5)
+        })
+        .catch((err) => {
+          console.error('Failed to add feedback:', err)
+        })
+      dispatch(loadProducts())
     }
   }
 
@@ -109,12 +126,24 @@ const ProductPage = () => {
         </Typography>
       ) : (
         feedbacks.map((feedback) => (
-          <Box key={feedback.id} sx={{ mb: 3 }}>
+          <Box key={feedback.id || feedback.tempId} sx={{ mb: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
               <Avatar sx={{ mr: 2 }} />
-              <Rating value={feedback.rating} precision={0.1} readOnly />
+              {feedback.rating ? (
+                <Rating value={feedback.rating} precision={0.1} readOnly />
+              ) : (
+                <Typography color='text.secondary'>
+                  Оценка загружается...
+                </Typography>
+              )}
             </Box>
-            <Typography variant='body1'>{feedback.comment}</Typography>
+            {feedback.comment ? (
+              <Typography variant='body1'>{feedback.comment}</Typography>
+            ) : (
+              <Typography color='text.secondary'>
+                Текст отзыва загружается...
+              </Typography>
+            )}
             <Divider sx={{ my: 4 }} />
           </Box>
         ))

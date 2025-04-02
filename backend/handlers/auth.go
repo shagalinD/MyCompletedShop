@@ -14,26 +14,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var secret = []byte(os.Getenv("SECRET_KEY"))
-
-func createAccessToken(userId uint) (string, error) {
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userId,                    // Subject (user identifier)
-		"iss": "todo-app",                  // Issuer
-		"exp": time.Now().Add(time.Minute * 15).Unix(), // Expiration time
-		"iat": time.Now().Unix(),                 // Issued at
-})
-
-	tokenString, err := claims.SignedString(secret)
-
-	if err != nil {
-		return "", err
-	}
-
-// Print information about the created token
-	return tokenString, nil
-}
-
 // Signup godoc
 // @Summary      Регистрирует нового пользователя
 // @Description  Регистрирует пользователя через почту и пароль
@@ -134,7 +114,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	accessToken, accessErr := createAccessToken(user.ID)
+	accessToken, accessErr := createAccessToken(foundUser.ID)
 
 	if accessErr != nil  {
 		c.JSON(http.StatusInternalServerError, gin.H{

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"kotoshop/models"
 	"kotoshop/postgres"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -57,10 +58,15 @@ func CreateProduct(c *gin.Context) {
 // @Failure      500  {object}  map[string]string
 // @Router       /api/products/get_all [get]
 func GetAllProducts(c *gin.Context) {
-	var products []models.Product
+	var products []struct {
+		models.Product
+		Rating float64 `json:"rating"`
+		FeedbackCount uint `json:"feedback_count"`
+	}
 
-	if err := postgres.DB.Find(&products).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
+	if err := postgres.DB.Table("products").Select("products.*, COALESCE(AVG(feedbacks.rating), 0) as rating, COUNT(feedbacks.id) as feedback_count").Joins("LEFT JOIN feedbacks ON feedbacks.product_id = products.id").Group("products.id").Order("products.id ASC").Scan(&products).Error; err != nil {
+			log.Printf("error on extracting products: %s", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
 					"error": "Ошибка при получении списка товаров",
 			})
 			return
@@ -68,3 +74,4 @@ func GetAllProducts(c *gin.Context) {
 
 	c.JSON(http.StatusOK, products)
 }
+

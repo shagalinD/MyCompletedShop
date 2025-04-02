@@ -10,5 +10,4 @@ type Product struct {
 	Description string `json:"description" example:"15.6 дюймов" `
 	Image string `json:"image" example:"/assets/cat-surprised.gif"`
 	Category string `gorm:"required" json:"category" example:"electronics"`
-	Rating float32 `json:"rating" example:"5.0"`
 }

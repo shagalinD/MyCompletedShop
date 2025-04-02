@@ -4,11 +4,14 @@ definitions:
       comment:
         example: Кот просто восторг!
         type: string
-      product_id:
+      productId:
         type: integer
       rating:
         example: 5
         type: number
+      user_id:
+        description: swagger:ignore
+        type: integer
     type: object
   models.Product:
     properties:
@@ -25,9 +28,6 @@ definitions:
         type: string
       price:
         example: 1500000
-        type: number
-      rating:
-        example: 5
         type: number
       title:
         example: MacBook Pro
@@ -89,46 +89,6 @@ paths:
       summary: Возвращает отзывы
       tags:
       - Feedback
-  /api/feedback/get_rating:
-    get:
-      consumes:
-      - application/json
-      description: Возвращает средний рейтинг всех отзывов на товар
-      parameters:
-      - description: ID товара
-        in: query
-        name: product_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Возвращает рейтинг
-      tags:
-      - Feedback
   /api/feedback/post:
     post:
       consumes:
@@ -141,6 +101,12 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/models.Feedback'
+      - default: Bearer
+        description: Токен в формате Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:

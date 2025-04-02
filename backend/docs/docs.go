@@ -75,66 +75,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/feedback/get_rating": {
-            "get": {
-                "description": "Возвращает средний рейтинг всех отзывов на товар",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Feedback"
-                ],
-                "summary": "Возвращает рейтинг",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID товара",
-                        "name": "product_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
         "/api/feedback/post": {
             "post": {
                 "description": "Отправляет отзыв пользователя на товар",
@@ -157,6 +97,14 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Feedback"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer",
+                        "description": "Токен в формате Bearer {token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -496,12 +444,16 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Кот просто восторг!"
                 },
-                "product_id": {
+                "productId": {
                     "type": "integer"
                 },
                 "rating": {
                     "type": "number",
                     "example": 5
+                },
+                "user_id": {
+                    "description": "swagger:ignore",
+                    "type": "integer"
                 }
             }
         },
@@ -526,10 +478,6 @@ const docTemplate = `{
                 "price": {
                     "type": "number",
                     "example": 1500000
-                },
-                "rating": {
-                    "type": "number",
-                    "example": 5
                 },
                 "title": {
                     "type": "string",

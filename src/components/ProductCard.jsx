@@ -6,6 +6,7 @@ import {
   Typography,
   Button,
   Rating,
+  Box,
 } from '@mui/material'
 import { motion } from 'framer-motion'
 import { useDispatch } from 'react-redux'
@@ -48,13 +49,12 @@ const ProductCard = ({ product }) => {
           <Typography variant='h6'>{product.title}</Typography>
           <Typography variant='body2'>{product.description}</Typography>
           <Typography variant='h5'>{product.price}$</Typography>
-          <Rating
-            value={product.rating}
-            precision={0.1}
-            readOnly
-            sx={{ mt: 1 }}
-          />
-
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, mt: 1 }}>
+            <Rating value={product.rating} precision={0.1} readOnly />
+            <Typography variant='subtitle2' color='text.secondary'>
+              ({product.feedback_count})
+            </Typography>
+          </Box>
           <Button
             variant='contained'
             onClick={() => dispatch(addToCart(product))}
