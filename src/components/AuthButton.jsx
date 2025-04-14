@@ -12,8 +12,12 @@ const AuthButton = () => {
     }
   }, [signedIn])
 
-  const handleClick = () => {
+  const handleLogin = () => {
     navigate('/auth') // Переход на страницу авторизации
+  }
+
+  const handleProfile = () => {
+    navigate('/profile')
   }
 
   return (
@@ -27,10 +31,11 @@ const AuthButton = () => {
             alt='Remy Sharp'
             src='/static/images/avatar/1.jpg'
             sx={{ width: 56, height: 56, cursor: 'pointer' }}
+            onClick={handleProfile}
           />
         </Tooltip>
       ) : (
-        <Button variant='outlined' color='primary' onClick={handleClick}>
+        <Button variant='outlined' color='primary' onClick={handleLogin}>
           Войти / Регистрация
         </Button>
       )}

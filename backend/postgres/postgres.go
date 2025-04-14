@@ -20,7 +20,7 @@ func Open(postgresString string) {
 		log.Fatal("Error on accessing database")
 	}
 
-	migratingErr := DB.AutoMigrate(&models.Product{}, &models.User{}, &models.Feedback{})
+	migratingErr := DB.AutoMigrate(&models.Product{}, &models.User{}, &models.Feedback{}, &models.Cart{}, &models.CartItem{}, &models.Order{}, &models.OrderItem{})
 
 	if migratingErr != nil {
 		log.Fatal("Error on migrating")

@@ -10,10 +10,19 @@ import {
 } from '@mui/material'
 import { motion } from 'framer-motion'
 import { useDispatch } from 'react-redux'
-import { addToCart } from '../features/cartSlice'
+import { addCartItem, fetchCart } from '../features/cartSlice'
 import { Link } from 'react-router-dom'
+
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch()
+
+  const handleAddToCart = async () => {
+    await dispatch(
+      addCartItem({ product_id: product.id, quantity: 1 })
+    ).unwrap()
+    dispatch(fetchCart())
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -27,7 +36,7 @@ const ProductCard = ({ product }) => {
           margin: 2,
           boxShadow: 3,
           display: 'flex',
-          flexDirection: 'column', // Элементы внутри будут располагаться вертикально
+          flexDirection: 'column',
         }}
       >
         <CardMedia
@@ -36,30 +45,25 @@ const ProductCard = ({ product }) => {
           image={product.image}
           alt={product.title}
           sx={{
-            objectPosition: 'top', // Указывает, что изображение должно быть выровнено по верхнему краю
-            marginBottom: 0, // Убирает отступ снизу изображения
-            paddingBottom: 0, // Убирает отступы по нижнему краю
+            objectPosition: 'top',
+            marginBottom: 0,
+            paddingBottom: 0,
           }}
         />
-        <CardContent
-          component={Link}
-          to={`/product/${product.id}`}
-          sx={{ paddingTop: 0, marginTop: 'auto' }}
-        >
-          <Typography variant='h6'>{product.title}</Typography>
-          <Typography variant='body2'>{product.description}</Typography>
-          <Typography variant='h5'>{product.price}$</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, mt: 1 }}>
-            <Rating value={product.rating} precision={0.1} readOnly />
-            <Typography variant='subtitle2' color='text.secondary'>
-              ({product.feedback_count})
-            </Typography>
+        <CardContent sx={{ paddingTop: 0, marginTop: 'auto' }}>
+          <Box component={Link} to={`/product/${product.id}`}>
+            <Typography variant='h6'>{product.title}</Typography>
+            <Typography variant='body2'>{product.description}</Typography>
+            <Typography variant='h5'>{product.price} ₽</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, mt: 1 }}>
+              <Rating value={product.rating} precision={0.1} readOnly />
+              <Typography variant='subtitle2' color='text.secondary'>
+                ({product.feedback_count})
+              </Typography>
+            </Box>
           </Box>
-          <Button
-            variant='contained'
-            onClick={() => dispatch(addToCart(product))}
-            sx={{ mt: 2 }}
-          >
+
+          <Button variant='contained' onClick={handleAddToCart} sx={{ mt: 2 }}>
             Добавить в корзину
           </Button>
         </CardContent>
@@ -67,4 +71,5 @@ const ProductCard = ({ product }) => {
     </motion.div>
   )
 }
+
 export default ProductCard

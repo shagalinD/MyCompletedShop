@@ -1,11 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import axios from 'axios'
 
 export const fetchFeedbacks = createAsyncThunk(
   'feedback/fetchFeedbacks',
   async (productId, { getState, extra }) => {
-    const { axios } = extra
-    const response = await axios.get(
+    const { axiosInstance } = extra
+    const response = await axiosInstance.get(
       `/feedback/get_all?product_id=${productId}`
     )
     return response.data
@@ -15,13 +14,46 @@ export const fetchFeedbacks = createAsyncThunk(
 export const addFeedback = createAsyncThunk(
   'feedback/addFeedback',
   async ({ productId, comment, rating }, { getState, extra }) => {
-    const { axios } = extra
-    const response = await axios.post(`/feedback/post`, {
+    const { axiosInstance } = extra
+    const response = await axiosInstance.post(`/feedback/post`, {
       comment,
       rating,
-      productId,
+      product_id: productId,
     })
     return response.data
+  }
+)
+
+export const fetchUserFeedback = createAsyncThunk(
+  'feedback/get_feedback',
+  async (product_id, { getState, extra }) => {
+    const { axiosInstance } = extra
+    const response = await axiosInstance.get(
+      `/feedback/get_feedback?product_id=${product_id}`
+    )
+    let feedback = response.data
+    feedback.exists = feedback.rating
+    return feedback
+  }
+)
+
+export const updateFeedback = createAsyncThunk(
+  'feedback/update_feedback',
+  async ({ comment, rating, productId }, { getState, extra }) => {
+    const { axiosInstance } = extra
+    console.log({
+      id: 1,
+      comment: comment,
+      rating: rating,
+      product_id: parseInt(productId),
+    })
+    const response = await axiosInstance.put(`/feedback/update_feedback`, {
+      id: 1,
+      comment: comment,
+      rating: rating,
+      product_id: productId,
+    })
+    return response
   }
 )
 
@@ -29,6 +61,7 @@ const feedbackSlice = createSlice({
   name: 'feedback',
   initialState: {
     items: [],
+    userFeedback: null,
     status: 'idle',
     error: null,
   },
@@ -46,28 +79,25 @@ const feedbackSlice = createSlice({
         state.status = 'failed'
         state.error = action.error.message
       })
-      .addCase(addFeedback.pending, (state, action) => {
-        // Можно добавить временный отзыв с флагом isPending
+      .addCase(fetchUserFeedback.pending, (state) => {
+        state.status = 'loading'
+      })
+      .addCase(fetchUserFeedback.fulfilled, (state, action) => {
+        ;(state.status = 'succeeded'), (state.userFeedback = action.payload)
+      })
+      .addCase(fetchUserFeedback.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.error.message
+      })
+      .addCase(addFeedback.pending, (state) => {
         state.status = 'loading'
       })
       .addCase(addFeedback.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        // Заменяем или добавляем полный объект от сервера
-        const index = state.items.findIndex(
-          (item) => item.tempId === action.meta.arg.tempId
-        )
-        if (index >= 0) {
-          state.items[index] = action.payload
-        } else {
-          state.items.push(action.payload)
-        }
       })
       .addCase(addFeedback.rejected, (state, action) => {
         state.status = 'failed'
-        // Удаляем временный отзыв, если был добавлен
-        state.items = state.items.filter(
-          (item) => item.tempId !== action.meta.arg.tempId
-        )
+        state.error = action.error.message
       })
   },
 })

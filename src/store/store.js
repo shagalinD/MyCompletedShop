@@ -3,6 +3,7 @@ import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import authReducer from '../features/authSlice'
 import productsReducer from '../features/productsSlice'
+import orderReducer from '../features/orderSlice'
 import cartReducer from '../features/cartSlice'
 import axios from 'axios'
 import feedbackReducer from '../features/feedbackSlice'
@@ -26,6 +27,9 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
+    if (error.config.skipInterceptors) {
+      return Promise.reject(error)
+    }
     if (error.response?.status === 401) {
       store.dispatch(logout())
       window.location.href = '/auth' // Перенаправление на страницу входа
@@ -41,11 +45,13 @@ const persistConfig = {
 }
 const persistedCartReducer = persistReducer(persistConfig, cartReducer)
 const persistedAuthReducer = persistReducer(persistConfig, authReducer)
+const persistedOrderReducer = persistReducer(persistConfig, orderReducer)
 export const store = configureStore({
   reducer: {
     products: productsReducer,
     cart: persistedCartReducer,
     auth: persistedAuthReducer,
+    order: persistedOrderReducer,
     feedback: feedbackReducer,
   },
   middleware: (getDefaultMiddleware) =>
@@ -54,7 +60,7 @@ export const store = configureStore({
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
       },
       thunk: {
-        extraArgument: { axios: axiosInstance },
+        extraArgument: { axiosInstance: axiosInstance },
       },
     }),
 })

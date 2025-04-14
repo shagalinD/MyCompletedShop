@@ -43,11 +43,13 @@ function App() {
         )}
       </IconButton>
       <Grid container spacing={2}>
+        {token && (
+          <Grid item xs={12} md={3}>
+            <Cart />
+          </Grid>
+        )}
         <Grid item xs={12} md={9}>
           <ProductList />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Cart />
         </Grid>
       </Grid>
     </Container>

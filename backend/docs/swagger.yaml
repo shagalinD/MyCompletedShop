@@ -10,7 +10,6 @@ definitions:
         example: 5
         type: number
       user_id:
-        description: swagger:ignore
         type: integer
     type: object
   models.Product:
@@ -33,6 +32,18 @@ definitions:
         example: MacBook Pro
         type: string
     type: object
+  models.RequestCartItem:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  models.RequestRemoveCartItem:
+    properties:
+      product_id:
+        type: integer
+    type: object
   models.User:
     properties:
       email:
@@ -49,6 +60,300 @@ info:
   title: Kotoshop
   version: "2.0"
 paths:
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Аутентифицирует пользователя через почту и пароль
+      parameters:
+      - description: Данные пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Аутентифицирует пользователя
+      tags:
+      - Auth
+  /api/auth/profile:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает данные о пользователе при корректном токене
+      parameters:
+      - description: Access Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Возвращает данные о пользователе
+      tags:
+      - Auth
+  /api/auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: Регистрирует пользователя через почту и пароль
+      parameters:
+      - description: Данные пользователя
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Регистрирует нового пользователя
+      tags:
+      - Auth
+  /api/cart/add_product:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет новые продукты в корзину пользователя
+      parameters:
+      - description: Данные товара
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.RequestCartItem'
+      - default: Bearer
+        description: Токен в формате Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Добавляет продукты в корзину
+      tags:
+      - Cart
+  /api/cart/clean_cart:
+    delete:
+      consumes:
+      - application/json
+      description: Полностью очищает корзину пользователя
+      parameters:
+      - default: Bearer
+        description: Токен в формате Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Очищает корзину
+      tags:
+      - Cart
+  /api/cart/get_cart:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает корзину со всеми товарами пользователя
+      parameters:
+      - default: Bearer
+        description: Токен в формате Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Возвращает корзину
+      tags:
+      - Cart
+  /api/cart/remove_product:
+    put:
+      consumes:
+      - application/json
+      description: Удаляем продукты из корзины пользователе по product_id
+      parameters:
+      - default: Bearer
+        description: Токен в формате Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Id продукта
+        in: body
+        name: ProductID
+        required: true
+        schema:
+          $ref: '#/definitions/models.RequestRemoveCartItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удаляем продукт корзины
+      tags:
+      - Cart
   /api/feedback/get_all:
     get:
       consumes:
@@ -87,6 +392,52 @@ paths:
               type: string
             type: object
       summary: Возвращает отзывы
+      tags:
+      - Feedback
+  /api/feedback/get_feedback:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает отзыв текущего пользователя на товар
+      parameters:
+      - description: ID товара
+        in: query
+        name: product_id
+        required: true
+        type: integer
+      - default: Bearer
+        description: Токен в формате Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Возвращает отзыв
       tags:
       - Feedback
   /api/feedback/post:
@@ -136,18 +487,24 @@ paths:
       summary: Отправляет отзыв
       tags:
       - Feedback
-  /api/login:
-    post:
+  /api/feedback/update_feedback:
+    put:
       consumes:
       - application/json
-      description: Аутентифицирует пользователя через почту и пароль
+      description: Обновляет отзыв пользователя
       parameters:
-      - description: Данные пользователя
+      - default: Bearer
+        description: Токен в формате Bearer {token}
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Данные отзыва
         in: body
-        name: user
+        name: FeedbackData
         required: true
         schema:
-          $ref: '#/definitions/models.User'
+          $ref: '#/definitions/models.Feedback'
       produces:
       - application/json
       responses:
@@ -174,9 +531,9 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Аутентифицирует пользователя
+      summary: Обновляет отзыв
       tags:
-      - Auth
+      - Feedback
   /api/products/get_all:
     get:
       consumes:
@@ -252,83 +609,6 @@ paths:
       summary: Добавляет товар
       tags:
       - Products
-  /api/profile:
-    get:
-      consumes:
-      - application/json
-      description: Возвращает данные о пользователе при корректном токене
-      parameters:
-      - description: Access Token
-        in: header
-        name: Authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties: true
-            type: object
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Возвращает данные о пользователе
-      tags:
-      - Auth
-  /api/signup:
-    post:
-      consumes:
-      - application/json
-      description: Регистрирует пользователя через почту и пароль
-      parameters:
-      - description: Данные пользователя
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/models.User'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.User'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties: true
-            type: object
-        "404":
-          description: Not Found
-          schema:
-            additionalProperties: true
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Регистрирует нового пользователя
-      tags:
-      - Auth
 securityDefinitions:
   BasicAuth:
     type: basic

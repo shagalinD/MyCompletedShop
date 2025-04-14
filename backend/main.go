@@ -38,14 +38,29 @@ func main() {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	r.POST("/api/signup", handlers.Signup)
-	r.POST("/api/login", handlers.Login)
+	r.POST("/api/auth/signup", handlers.Signup)
+	r.POST("/api/auth/login", handlers.Login)
+	r.GET("/api/auth/profile", handlers.AuthMiddleware,handlers.Profile)
+	r.PUT("/api/auth/update", handlers.AuthMiddleware, handlers.UpdateUser)
+
 	r.POST("/api/products/post", handlers.CreateProduct)
 	r.GET("/api/products/get_all", handlers.GetAllProducts)
-	r.GET("/api/profile", handlers.Profile)
-	r.GET("/api/feedback/get_all", handlers.GetFeedbacks)
+
 	r.POST("/api/feedback/post", handlers.AuthMiddleware, handlers.PostFeedback)
+	r.GET("/api/feedback/get_all", handlers.GetFeedbacks)
+	r.GET("/api/feedback/get_feedback", handlers.AuthMiddleware, handlers.GetUserFeedback)
+	r.PUT("/api/feedback/update_feedback", handlers.AuthMiddleware, handlers.UpdateFeedback)
+
+	r.POST("/api/cart/add_product", handlers.AuthMiddleware, handlers.AddToCart)
+	r.GET("/api/cart/get_cart", handlers.AuthMiddleware, handlers.GetCart)
+	r.PUT("/api/cart/remove_product", handlers.AuthMiddleware, handlers.DeleteCartItem)
+	r.DELETE("/api/cart/clean_cart", handlers.AuthMiddleware, handlers.CleanCart)
+	
+	r.POST("/api/order/create", handlers.AuthMiddleware, handlers.CreateOrder)
+	r.GET("/api/order/get_all", handlers.AuthMiddleware, handlers.GetUserOrders)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.Run()
 }
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDYzOTE4NzQsImlhdCI6MTc0Mzc5OTg3NCwiaXNzIjoidG9kby1hcHAiLCJzdWIiOjF9.7pDh3AJVygRo4mhSxGY2sDQOfZsdNVnQJyaWeYouRPY

@@ -15,6 +15,445 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/auth/login": {
+            "post": {
+                "description": "Аутентифицирует пользователя через почту и пароль",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Аутентифицирует пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные пользователя",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/profile": {
+            "get": {
+                "description": "Возвращает данные о пользователе при корректном токене",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Возвращает данные о пользователе",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Access Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/signup": {
+            "post": {
+                "description": "Регистрирует пользователя через почту и пароль",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Регистрирует нового пользователя",
+                "parameters": [
+                    {
+                        "description": "Данные пользователя",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cart/add_product": {
+            "post": {
+                "description": "Добавляет новые продукты в корзину пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Добавляет продукты в корзину",
+                "parameters": [
+                    {
+                        "description": "Данные товара",
+                        "name": "item",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RequestCartItem"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer",
+                        "description": "Токен в формате Bearer {token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cart/clean_cart": {
+            "delete": {
+                "description": "Полностью очищает корзину пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Очищает корзину",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer",
+                        "description": "Токен в формате Bearer {token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cart/get_cart": {
+            "get": {
+                "description": "Возвращает корзину со всеми товарами пользователя",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Возвращает корзину",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer",
+                        "description": "Токен в формате Bearer {token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cart/remove_product": {
+            "put": {
+                "description": "Удаляем продукты из корзины пользователе по product_id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cart"
+                ],
+                "summary": "Удаляем продукт корзины",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer",
+                        "description": "Токен в формате Bearer {token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Id продукта",
+                        "name": "ProductID",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RequestRemoveCartItem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/feedback/get_all": {
             "get": {
                 "description": "Возвращает список всех отзывов на товар",
@@ -34,6 +473,74 @@ const docTemplate = `{
                         "description": "ID товара",
                         "name": "product_id",
                         "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/feedback/get_feedback": {
+            "get": {
+                "description": "Возвращает отзыв текущего пользователя на товар",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Feedback"
+                ],
+                "summary": "Возвращает отзыв",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID товара",
+                        "name": "product_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "default": "Bearer",
+                        "description": "Токен в формате Bearer {token}",
+                        "name": "Authorization",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -145,9 +652,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/login": {
-            "post": {
-                "description": "Аутентифицирует пользователя через почту и пароль",
+        "/api/feedback/update_feedback": {
+            "put": {
+                "description": "Обновляет отзыв пользователя",
                 "consumes": [
                     "application/json"
                 ],
@@ -155,17 +662,25 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Auth"
+                    "Feedback"
                 ],
-                "summary": "Аутентифицирует пользователя",
+                "summary": "Обновляет отзыв",
                 "parameters": [
                     {
-                        "description": "Данные пользователя",
-                        "name": "user",
+                        "type": "string",
+                        "default": "Bearer",
+                        "description": "Токен в формате Bearer {token}",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Данные отзыва",
+                        "name": "FeedbackData",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.Feedback"
                         }
                     }
                 ],
@@ -319,121 +834,6 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/api/profile": {
-            "get": {
-                "description": "Возвращает данные о пользователе при корректном токене",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Возвращает данные о пользователе",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Access Token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/signup": {
-            "post": {
-                "description": "Регистрирует пользователя через почту и пароль",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Регистрирует нового пользователя",
-                "parameters": [
-                    {
-                        "description": "Данные пользователя",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.User"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -452,7 +852,6 @@ const docTemplate = `{
                     "example": 5
                 },
                 "user_id": {
-                    "description": "swagger:ignore",
                     "type": "integer"
                 }
             }
@@ -482,6 +881,25 @@ const docTemplate = `{
                 "title": {
                     "type": "string",
                     "example": "MacBook Pro"
+                }
+            }
+        },
+        "models.RequestCartItem": {
+            "type": "object",
+            "properties": {
+                "product_id": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RequestRemoveCartItem": {
+            "type": "object",
+            "properties": {
+                "product_id": {
+                    "type": "integer"
                 }
             }
         },

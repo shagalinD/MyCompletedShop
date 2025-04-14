@@ -16,7 +16,7 @@ func createAccessToken(userId uint) (string, error) {
 	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"sub": userId,                    // Subject (user identifier)
 		"iss": "todo-app",                  // Issuer
-		"exp": time.Now().Add(time.Minute * 15).Unix(), // Expiration time
+		"exp": time.Now().Add(time.Hour*24*30).Unix(), // Expiration time
 		"iat": time.Now().Unix(),                 // Issued at
 })
 

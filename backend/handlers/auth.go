@@ -6,11 +6,8 @@ import (
 	"kotoshop/postgres"
 	"log"
 	"net/http"
-	"os"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -25,7 +22,7 @@ import (
 // @Failure      400  {object}  map[string]interface{}
 // @Failure      404  {object}  map[string]interface{}
 // @Failure      500  {object}  map[string]interface{}
-// @Router       /api/signup [post]
+// @Router       /api/auth/signup [post]
 func Signup(c *gin.Context) {
 	var user models.User 
 
@@ -88,7 +85,7 @@ func Signup(c *gin.Context) {
 // @Failure      400  {object}  map[string]string
 // @Failure      404  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
-// @Router       /api/login [post]
+// @Router       /api/auth/login [post]
 func Login(c *gin.Context) {
 	var user models.User 
 
@@ -141,42 +138,62 @@ func Login(c *gin.Context) {
 // @Failure      400  {object}  map[string]string
 // @Failure      404  {object}  map[string]string
 // @Failure      500  {object}  map[string]string
-// @Router       /api/profile [get]
+// @Router       /api/auth/profile [get]
 func Profile(c *gin.Context) {
-	tokenString := c.GetHeader("Authorization")
+	userID := c.GetUint("userID")
 
-	if tokenString == "" {
-		c.AbortWithStatus(http.StatusBadRequest)
+	var user models.User 
+	if err := postgres.DB.Select("email, first_name, last_name, phone_number").First(&user, userID).Error; err != nil {
+		log.Printf("error on selecting database: %v", err )
+		c.AbortWithStatus(http.StatusUnauthorized)
+
+		return 
 	}
 
-	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-		}
-
-		return []byte(os.Getenv("SECRET_KEY")), nil
+	c.JSON(http.StatusOK, gin.H{
+		"email": user.Email,
+		"first_name": user.FirstName,
+		"last_name":user.LastName,
+		"phone_number":user.PhoneNumber,
 	})
-	
-	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
+}
+
+func UpdateUser (c *gin.Context) {
+	userID := c.GetUint("userID")
+
+	var req struct {
+		FirstName string `json:"first_name"`
+		LastName string `json:"last_name"`
+		PhoneNumber string `json:"phone_number"`
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error":"access token expired",
-			})
-		}
-
-		var user models.User 
-		if err := postgres.DB.Select("email").First(&user, claims["sub"]).Error; err != nil {
-			c.AbortWithStatus(http.StatusUnauthorized)
-		}
-
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"email": user.Email,
+	if err := c.ShouldBindJSON(&req); err != nil{
+		log.Printf("error on parsing request: %v", err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error":"error on parsing request",
 		})
-	} else {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		return 
 	}
+
+	var user models.User 
+
+	if err := postgres.DB.First(&user, userID).Error; err != nil {
+		log.Printf("error on getting user: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error":"error on getting user",
+		})
+		return
+	}
+
+	if err := postgres.DB.Model(&user).Updates(models.User{FirstName: req.FirstName, LastName: req.LastName, PhoneNumber: req.PhoneNumber}).Error; err != nil {
+		log.Printf("error on updating user: %v", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error":"error on updating user",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":"user updated successfully",
+	})
 }

@@ -19,16 +19,18 @@ const AuthPage = () => {
     e.preventDefault()
 
     if (isLogin) {
-      // Логин
-      const result = await dispatch(loginUser(formData))
-      if (result.meta.requestStatus === 'fulfilled') {
-        navigate('/shop') // Перенаправление после успешного входа
+      try {
+        await dispatch(loginUser(formData)).unwrap()
+        navigate('/shop') // Сработает только при успешном выполнении
+      } catch (error) {
+        // Обработка ошибки
       }
     } else {
-      // Регистрация
-      const result = await dispatch(registerUser(formData))
-      if (result.meta.requestStatus === 'fulfilled') {
-        navigate('/shop') // Перенаправление после успешной регистрации
+      try {
+        await dispatch(registerUser(formData)).unwrap()
+        navigate('/shop') // Сработает только при успешной регистрации
+      } catch (error) {
+        // Обработка ошибки
       }
     }
   }
@@ -47,7 +49,7 @@ const AuthPage = () => {
 
         {error && (
           <Alert severity='error' sx={{ mb: 2 }}>
-            {error}
+            {error.message}
           </Alert>
         )}
 
